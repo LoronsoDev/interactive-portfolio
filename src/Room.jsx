@@ -6,7 +6,7 @@ import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export default function Room(props) {
-  const { nodes, materials, scene } = useGLTF('/room.glb')
+  const { nodes, materials, scene } = useGLTF('./room.glb')
   return (
     <group {...props} dispose={null}>
       <primitive object={ scene } />
@@ -14,4 +14,4 @@ export default function Room(props) {
   )
 }
 
-useGLTF.preload('/room.glb')
+useGLTF.preload('./room.glb')

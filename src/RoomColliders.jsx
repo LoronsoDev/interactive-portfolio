@@ -7,7 +7,7 @@ import { useGLTF } from '@react-three/drei'
 import { MeshCollider, RigidBody } from '@react-three/rapier'
 
 export default function RoomColliders(props) {
-  const { nodes, materials, scene } = useGLTF('/room_colls.glb')
+  const { nodes, materials, scene } = useGLTF('./room_colls.glb')
   return (
       <group {...props} dispose={null}>
         <RigidBody colliders={"trimesh"} type="fixed">
@@ -17,4 +17,4 @@ export default function RoomColliders(props) {
   )
 }
 
-useGLTF.preload('/room_colls.glb')
+useGLTF.preload('./room_colls.glb')

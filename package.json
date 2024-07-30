@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build --base=./interactive-portfolio/"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "4.2",

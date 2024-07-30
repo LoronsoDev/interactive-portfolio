@@ -4,7 +4,6 @@ import restart from 'vite-plugin-restart'
 
 export default {
     root: 'src/',
-    base: '/interactive-portfolio/',
     publicDir: '../public/',
     plugins:
     [

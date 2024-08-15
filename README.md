@@ -6,4 +6,6 @@ If you want to check out how to create rapier based cars, or just how to use rap
 
 This is a very useful example of how to properly use React Three Fiber & Drei, as well as the rapier physics engine and its raycast based vehicles with React, since there isn't almost any information out there.
 
-Please check my live portfolio at https://loronsodev.github.io/interactive-portfolio/
+You can check my live portfolio at https://loronsodev.github.io/interactive-portfolio/, which is running directly from the code hosted in the master branch in this repo.
+
+Have fun :)

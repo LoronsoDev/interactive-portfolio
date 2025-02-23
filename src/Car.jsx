@@ -5,10 +5,15 @@ import { CuboidCollider, Physics, RigidBody, RoundCylinderCollider, useAfterPhys
 import { useRef, useEffect, forwardRef } from "react"
 import { BoxGeometry, MeshBasicMaterial, Vector3 } from "three"
 import * as THREE from "three"
+import { useMobileControls } from './MobileControls'
 
 const Car = forwardRef((props, chassisRef) =>
 {
-    const defaultPosition = [-18,3,30]
+    const defaultPosition = [-18, 3, 30]
+    const defaultRotation = new THREE.Quaternion().setFromAxisAngle(
+        new THREE.Vector3(0, 1, 0), // Y axis
+        Math.PI * 0.5  // 90 degrees in radians
+    )
 
     const { world, rapier } = useRapier()
     const vehicleController = useRef()
@@ -22,23 +27,39 @@ const Car = forwardRef((props, chassisRef) =>
 
     const [subscribeKeys, getKeys] = useKeyboardControls()
     
+    const mobileControls = useMobileControls()
+    
     useFrame((state, delta) =>
         {
-            const {forward, back, left, right, turbo, brake, reset} = getKeys()
+            const keyboardControls = getKeys()
             
-            const acceleration = 12
-            let engineForce = (forward * acceleration) - (back * acceleration)
+            // Combine keyboard and mobile controls
+            const controls = {
+                forward: keyboardControls.forward || mobileControls.forward,
+                back: keyboardControls.back || mobileControls.back,
+                left: keyboardControls.left || mobileControls.left,
+                right: keyboardControls.right || mobileControls.right,
+                turbo: keyboardControls.turbo || mobileControls.turbo,
+                brake: keyboardControls.brake || mobileControls.brake,
+                reset: keyboardControls.reset || mobileControls.reset
+            }
+            
+            // Reduced acceleration and added sensitivity multiplier
+            const acceleration = 6 // Reduced from 12
+            const accelerationSensitivity = 0.7 // Added sensitivity multiplier
+            let engineForce = ((controls.forward * acceleration) - (controls.back * acceleration)) * accelerationSensitivity
+            
             const turboMultiplier = 2.5
             const brakePower = 0.1
             
             const vehController = vehicleController.current
             
-            if(reset)
+            if(controls.reset)
             {
                 vehController.chassis().setTranslation(new rapier.Vector3(defaultPosition[0], defaultPosition[1], defaultPosition[2]))
                 vehController.chassis().setLinvel(new rapier.Vector3(0, 0, 0))
                 vehController.chassis().setAngvel(new rapier.Vector3(0,0,0), true)
-                vehController.chassis().setRotation(new rapier.Quaternion(0,0,0,1), true) // (0,0,0,1) is quaternion identity DO NOT provide (0,0,0,0), doesn't work
+                vehController.chassis().setRotation(defaultRotation, true)
             }
 
 
@@ -47,14 +68,14 @@ const Car = forwardRef((props, chassisRef) =>
             // orbitControls.current.maxDistance = 10
             // orbitControls.current.maxPolarAngle = 3.1415 / 2
             
-            if (turbo) engineForce *= turboMultiplier
-            vehController.setWheelBrake(0, brakePower * brake)
-            vehController.setWheelBrake(1, brakePower * brake)
-            vehController.setWheelBrake(2, brakePower * brake)
-            vehController.setWheelBrake(3, brakePower * brake)
+            if (controls.turbo) engineForce *= turboMultiplier
+            vehController.setWheelBrake(0, brakePower * controls.brake)
+            vehController.setWheelBrake(1, brakePower * controls.brake)
+            vehController.setWheelBrake(2, brakePower * controls.brake)
+            vehController.setWheelBrake(3, brakePower * controls.brake)
 
             const maxSteerAngle = Math.PI/6
-            let dir = left - right
+            let dir = mobileControls.left - mobileControls.right
             const currentSteering = vehController.wheelSteering(0) || 0
 
             const steering = THREE.MathUtils.lerp(currentSteering, maxSteerAngle * dir, 0.1)
@@ -153,7 +174,7 @@ const Car = forwardRef((props, chassisRef) =>
                 </mesh>
             </RigidBody>
 
-            <RigidBody colliders={false} ref={chassisRef} position={ defaultPosition } canSleep={false}>
+            <RigidBody colliders={false} ref={chassisRef} position={defaultPosition} rotation={[0, Math.PI * 0.5, 0]} canSleep={false}>
                 
                 <CuboidCollider args={chassisSize} />
                 
